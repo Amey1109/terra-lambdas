@@ -1,0 +1,15 @@
+version: 2.1
+
+jobs:
+  hello:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Say Hello
+          command: echo "Hello 👋"
+
+workflows:
+  hello_workflow:
+    jobs:
+      - hello
