@@ -28,6 +28,15 @@ data "aws_s3_object" "lambda_zips" {
 }
 
 
+resource "aws_lambda_layer_version" "terra_lambda_layers" {
+  for_each = var.layers
+
+  layer_name = "${var.env}_${each.key}"
+  s3_bucket  = var.lambda-bucket
+  s3_key     = each.value.s3_key
+}
+
+
 #lambda function
 resource "aws_lambda_function" "terra_lambda_function" {
   for_each      = var.lambdas
