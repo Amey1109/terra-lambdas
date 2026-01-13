@@ -27,6 +27,13 @@ data "aws_s3_object" "lambda_zips" {
   key      = each.value.s3_key
 }
 
+resource "aws_lambda_layer_version" "terra_lambda_layers" {
+  for_each            = var.layers
+  layer_name          = each.key
+  s3_bucket           = each.value.s3_key
+  compatible_runtimes = each.value.compatible_runtimes
+}
+
 
 #lambda function
 resource "aws_lambda_function" "terra_lambda_function" {
@@ -40,10 +47,9 @@ resource "aws_lambda_function" "terra_lambda_function" {
   runtime = each.value.runtime
   handler = each.value.handler
 
-  layers = [
-    for layer_key in each.value.layers :
-    aws_lambda_layer_version.terra_lambda_layers[layer_key].arn
-  ]
+  layers = each.value.layers != null && length(each.value.layers) > 0 ? [
+    for layer_key in each.value.layers : aws_lambda_layer_version.terra_lambda_layers[layer_key].arn
+  ] : []
 
   environment {
     variables = each.value.env_vars
