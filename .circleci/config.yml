@@ -67,11 +67,11 @@ jobs:
 
       - run:
           name: Terraform Plan (Prod)
-          command: terraform plan -var-file=prod.tfvars -auto-approve
+          command: terraform plan -var-file=prod.tfvars
 
       - run:
           name: Terraform Apply (Prod)
-          command: terraform apply -var-file=prod.tfvars -auto-approve
+          command: terraform plan -var-file=prod.tfvars -auto-approve
 
 workflows:
   terraform:
