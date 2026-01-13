@@ -22,6 +22,7 @@ jobs:
             unzip terraform.zip
             sudo mv terraform /usr/local/bin/
             terraform version
+
       - run:
           name: Terraform Init
           command: terraform init
@@ -35,8 +36,71 @@ jobs:
           name: Terraform Apply (Dev)
           command: terraform apply -auto-approve -var-file=dev.tfvars
 
+  hold-prod:
+    type: approval
+
+  terraform-prod:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install Terraform 1.14.3
+          command: |
+            TERRAFORM_VERSION=1.14.3
+            curl -fsSL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o terraform.zip
+            unzip terraform.zip
+            sudo mv terraform /usr/local/bin/
+            terraform version
+
+      - run:
+          name: Terraform Init
+          command: terraform init
+
+      - run:
+          name: Select Prod Workspace
+          command: |
+            terraform workspace select prod || terraform workspace new prod
+
+      - run:
+          name: Terraform Plan (Prod)
+          command: |
+            terraform plan \
+              -var-file=prod.tfvars \
+              -out=prod.tfplan
+
+      - run:
+          name: Terraform Apply (Prod)
+          command: terraform apply prod.tfplan
+
 workflows:
-  terraform-dev:
-    when: << pipeline.parameters.run_from_lambda >>
+  terraform:
     jobs:
-      - terraform-dev
+      - terraform-dev:
+          when: << pipeline.parameters.run_from_lambda >>
+          filters:
+            branches:
+              only: master
+            tags:
+              ignore: /.*/
+
+      - hold-prod:
+          requires:
+            - terraform-dev
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^prod-v.*/
+
+      - terraform-prod:
+          requires:
+            - hold-prod
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^prod-v.*/

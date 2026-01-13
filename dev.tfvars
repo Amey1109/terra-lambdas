@@ -11,6 +11,11 @@ lambdas = {
     s3_key  = "simple-js.zip"
     runtime = "nodejs20.x"
     handler = "index.handler"
+    layers  = []
+    env_vars = {
+      STAGE     = "dev"
+      LOG_LEVEL = "DEBUG"
+    }
   }
 
   "simple_python" = {

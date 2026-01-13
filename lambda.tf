@@ -39,6 +39,15 @@ resource "aws_lambda_function" "terra_lambda_function" {
 
   runtime = each.value.runtime
   handler = each.value.handler
+
+  layers = [
+    for layer_key in each.value.layers :
+    aws_lambda_layer_version.terra_lambda_layers[layer_key].arn
+  ]
+
+  environment {
+    variables = each.value.env_vars
+  }
 }
 
 
