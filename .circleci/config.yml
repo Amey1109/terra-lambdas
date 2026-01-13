@@ -80,16 +80,13 @@ workflows:
   terraform:
     jobs:
       - terraform-dev:
-          when: << pipeline.parameters.run_from_lambda >>
           filters:
             branches:
-              only: master
+              only: dev
             tags:
               ignore: /.*/
 
       - hold-prod:
-          requires:
-            - terraform-dev
           filters:
             branches:
               ignore: /.*/
