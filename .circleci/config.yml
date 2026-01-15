@@ -14,6 +14,15 @@ jobs:
     steps:
       - checkout
 
+      # Early exit if pipeline parameter is false
+      - run:
+          name: Skip if not run_from_lambda
+          command: |
+            if [ "<< pipeline.parameters.run_from_lambda >>" != "true" ]; then
+              echo "Skipping Terraform Dev"
+              exit 0
+            fi
+
       - run:
           name: Install Terraform 1.14.3
           command: |
@@ -80,18 +89,11 @@ workflows:
   terraform:
     jobs:
       - terraform-dev:
-          # Conditional run based on parameter
-          # This uses CircleCI 2.1 "filters" + "when" replacement logic
           filters:
             branches:
               only: master
             tags:
               ignore: /.*/
-          # Skip job if run_from_lambda is false
-          context: []
-          matrix:
-            parameters:
-              run_from_lambda: true
 
       - hold-prod:
           requires:
