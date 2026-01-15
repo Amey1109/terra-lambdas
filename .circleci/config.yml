@@ -1,31 +1,13 @@
 version: 2.1
 
-# Pipeline-level parameters
-parameters:
-  run_from_lambda:
-    type: boolean
-    default: false
-
 jobs:
   terraform-dev:
-    parameters:
-      run_from_lambda:
-        type: boolean
-        default: false
     docker:
       - image: cimg/base:stable
     working_directory: ~/repo
+
     steps:
       - checkout
-
-      # Early exit if pipeline parameter is false
-      - run:
-          name: Skip if not run_from_lambda
-          command: |
-            if [ "<< parameters.run_from_lambda >>" != "true" ]; then
-              echo "Skipping Terraform Dev"
-              exit 0
-            fi
 
       - run:
           name: Install Terraform 1.14.3
@@ -56,6 +38,7 @@ jobs:
     docker:
       - image: cimg/base:stable
     working_directory: ~/repo
+
     steps:
       - checkout
 
@@ -91,9 +74,7 @@ jobs:
 workflows:
   terraform:
     jobs:
-      # Pass workflow-level parameter to the job
       - terraform-dev:
-          run_from_lambda: << pipeline.parameters.run_from_lambda >>
           filters:
             branches:
               only: master
