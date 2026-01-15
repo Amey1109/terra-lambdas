@@ -5,7 +5,6 @@ jobs:
     docker:
       - image: cimg/base:stable
     working_directory: ~/repo
-
     steps:
       - checkout
 
@@ -38,7 +37,6 @@ jobs:
     docker:
       - image: cimg/base:stable
     working_directory: ~/repo
-
     steps:
       - checkout
 
@@ -74,6 +72,7 @@ jobs:
 workflows:
   terraform:
     jobs:
+      # DEV: trigger via branch or API
       - terraform-dev:
           filters:
             branches:
@@ -81,6 +80,7 @@ workflows:
             tags:
               ignore: /.*/
 
+      # PROD: tag-based with approval
       - hold-prod:
           requires:
             - terraform-dev
