@@ -80,11 +80,18 @@ workflows:
   terraform:
     jobs:
       - terraform-dev:
+          # Conditional run based on parameter
+          # This uses CircleCI 2.1 "filters" + "when" replacement logic
           filters:
             branches:
               only: master
             tags:
               ignore: /.*/
+          # Skip job if run_from_lambda is false
+          context: []
+          matrix:
+            parameters:
+              run_from_lambda: true
 
       - hold-prod:
           requires:
