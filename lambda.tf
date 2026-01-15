@@ -36,6 +36,12 @@ resource "aws_lambda_layer_version" "terra_lambda_layers" {
   s3_key     = each.value.s3_key
 }
 
+resource "aws_s3_bucket_versioning" "lambda_bucket" {
+  bucket = var.lambda-bucket
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 
 #lambda function
 resource "aws_lambda_function" "terra_lambda_function" {
@@ -43,8 +49,9 @@ resource "aws_lambda_function" "terra_lambda_function" {
   function_name = "${var.env}_${each.key}_lambda"
   role          = aws_iam_role.terra_lambda_role.arn
 
-  s3_bucket = var.lambda-bucket
-  s3_key    = each.value.s3_key
+  s3_bucket         = var.lambda-bucket
+  s3_key            = each.value.s3_key
+  s3_object_version = data.aws_s3_object.lambda_zips[each.key].version_id
 
   runtime = each.value.runtime
   handler = each.value.handler
