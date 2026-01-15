@@ -77,7 +77,7 @@ workflows:
       - terraform-dev:
           filters:
             branches:
-              only: master
+              only: dev
             tags:
               ignore: /.*/
 
