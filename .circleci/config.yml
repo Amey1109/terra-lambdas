@@ -1,5 +1,19 @@
 version: 2.1
 
+############################
+# Pipeline Parameters
+############################
+parameters:
+  is_dev:
+    type: boolean
+    default: false
+  is_prod:
+    type: boolean
+    default: false
+
+############################
+# Jobs
+############################
 jobs:
   terraform-dev:
     docker:
@@ -69,32 +83,21 @@ jobs:
           name: Terraform Apply (Prod)
           command: terraform apply prod.tfplan
 
+############################
+# Workflows
+############################
 workflows:
-  terraform:
+  version: 2
+
+  dev:
+    when: << pipeline.parameters.is_dev >>
     jobs:
-      # DEV: trigger via branch or API
-      - terraform-dev:
-          filters:
-            branches:
-              only: dev
-            tags:
-              ignore: /.*/
+      - terraform-dev
 
-      # PROD: tag-based with approval
-      - hold-prod:
-          requires:
-            - terraform-dev
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^prod-v.*/
-
+  prod:
+    when: << pipeline.parameters.is_prod >>
+    jobs:
+      - hold-prod
       - terraform-prod:
           requires:
             - hold-prod
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^prod-v.*/

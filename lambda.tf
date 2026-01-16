@@ -27,7 +27,6 @@ data "aws_s3_object" "lambda_zips" {
   key      = each.value.s3_key
 }
 
-
 resource "aws_lambda_layer_version" "terra_lambda_layers" {
   for_each = var.layers
 
