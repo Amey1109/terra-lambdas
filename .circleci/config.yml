@@ -70,7 +70,7 @@ jobs:
       - run:
           name: Select Prod Workspace
           command: |
-            terraform workspace select prod || terraform workspace new prod
+            terraform workspace select default || terraform workspace new default
 
       - run:
           name: Terraform Plan (Prod)
@@ -81,7 +81,7 @@ jobs:
 
       - run:
           name: Terraform Apply (Prod)
-          command: terraform apply prod.tfplan
+          command: terraform apply -auto-approve -var-file=prod.tfvars
 
 ############################
 # Workflows
