@@ -34,4 +34,4 @@ layers = {
 }
 
 
-lambda-bucket = "terra-lambdas"
+lambda-bucket = "dev-terra-lambdas"

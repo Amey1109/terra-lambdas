@@ -1,4 +1,4 @@
-env = "dev"
+env = "prod"
 
 lambdas = {
   "js_with_deps" = {
@@ -30,4 +30,4 @@ layers = {
 }
 
 
-lambda-bucket = "terra-lambdas"
+lambda-bucket = "prod-terra-lambdas"
